@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Simple proposed file structure:
+/
+├── app/                  # Next.js App Router
+│   ├── (staking)/        # Optional: Route group for staking features
+│   │   ├── stake/
+│   │   │   └── page.tsx  # Page for staking tokens
+│   │   ├── unstake/
+│   │   │   └── page.tsx  # Page for unstaking tokens
+│   │   ├── rewards/
+│   │   │   └── page.tsx  # Page to view/claim rewards
+│   │   └── layout.tsx    # Layout specific to the staking section
+│   ├── api/              # API routes (if needed for backend logic)
+│   │   └── (solana)/     # Solana related backend endpoints
+│   │       └── ...
+│   ├── globals.css
+│   ├── layout.tsx        # Root layout
+│   └── page.tsx          # Homepage
+├── components/           # Reusable UI components
+│   ├── layout/           # General layout components (e.g., Navbar, Footer)
+│   │   ├── Navbar.tsx
+│   │   └── Footer.tsx
+│   ├── staking/          # UI components specific to staking
+│   │   ├── StakeForm.tsx
+│   │   ├── UnstakeModal.tsx
+│   │   └── StakingStats.tsx
+│   └── ui/               # Generic UI elements (Button, Input, Card)
+│       ├── Button.tsx
+│       └── Card.tsx
+├── solana/               # Core Solana logic
+│   ├── utils/            # Utility functions (e.g., connection, wallet helpers, transaction signers)
+│   │   ├── connection.ts # Solana connection setup
+│   │   └── wallet.ts     # Wallet adapter integration/helpers
+│   ├── instructions/     # Functions to create transaction instructions for your staking program
+│   │   ├── stakeTokens.ts
+│   │   └── claimRewards.ts
+│   ├── accounts/         # Logic for fetching and parsing on-chain account data
+│   │   └── stakingPool.ts
+│   ├── constants.ts      # Solana program IDs, RPC endpoints, etc.
+│   └── pda.ts            # Functions for deriving Program Derived Addresses (PDAs)
+├── hooks/                # Custom React hooks
+│   ├── useSolanaWallet.ts # Hook for wallet state and actions
+│   ├── useStakingProgram.ts # Hook for interacting with your staking program
+│   └── useTokenBalance.ts # Hook for fetching token balances
+├── contexts/             # React Context for global state management
+│   └── WalletContextProvider.tsx # Context for Solana wallet connection
+├── lib/                  # General utility functions, helpers, or configurations
+│   └── utils.ts
+├── public/               # Static assets (images, fonts)
+├── types/                # TypeScript type definitions
+│   ├── solana.ts         # Types related to your staking program or Solana interactions
+│   └── index.ts
+├── .env.local            # Environment variables (RPC URL, program IDs - remember to .gitignore)
+├── next.config.mjs
+├── package.json
+├── postcss.config.mjs
+├── tailwind.config.ts
+└── tsconfig.json

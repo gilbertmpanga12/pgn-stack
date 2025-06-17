@@ -1,0 +1,1834 @@
+{
+    "address": "8icXpLgEgEVVbvhTAgL7W7AUMZbaUh1UJ1czMiQXCuVE",
+    "metadata": {
+      "name": "pgn_staking",
+      "version": "0.1.0",
+      "spec": "0.1.0",
+      "description": "Created with Anchor"
+    },
+    "instructions": [
+      {
+        "name": "add_custom_domain",
+        "discriminator": [
+          218,
+          122,
+          170,
+          253,
+          19,
+          30,
+          237,
+          180
+        ],
+        "accounts": [
+          {
+            "name": "domain_registry",
+            "writable": true
+          },
+          {
+            "name": "authority",
+            "signer": true,
+            "relations": [
+              "domain_registry"
+            ]
+          }
+        ],
+        "args": [
+          {
+            "name": "name",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "enable_withdrawals",
+        "discriminator": [
+          97,
+          146,
+          76,
+          161,
+          177,
+          54,
+          109,
+          83
+        ],
+        "accounts": [
+          {
+            "name": "program_state",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    112,
+                    114,
+                    111,
+                    103,
+                    114,
+                    97,
+                    109,
+                    95,
+                    115,
+                    116,
+                    97,
+                    116,
+                    101
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "user_reward",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    117,
+                    115,
+                    101,
+                    114,
+                    95,
+                    114,
+                    101,
+                    119,
+                    97,
+                    114,
+                    100
+                  ]
+                },
+                {
+                  "kind": "arg",
+                  "path": "user_address"
+                },
+                {
+                  "kind": "arg",
+                  "path": "batch_id"
+                }
+              ]
+            }
+          },
+          {
+            "name": "market_maker",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          }
+        ],
+        "args": [
+          {
+            "name": "batch_id",
+            "type": "u64"
+          },
+          {
+            "name": "user_address",
+            "type": "pubkey"
+          }
+        ]
+      },
+      {
+        "name": "initialize",
+        "discriminator": [
+          175,
+          175,
+          109,
+          31,
+          13,
+          152,
+          155,
+          237
+        ],
+        "accounts": [
+          {
+            "name": "admin",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "pgn_mint"
+          },
+          {
+            "name": "program_state",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    112,
+                    114,
+                    111,
+                    103,
+                    114,
+                    97,
+                    109,
+                    95,
+                    115,
+                    116,
+                    97,
+                    116,
+                    101
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "vault",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    118,
+                    97,
+                    117,
+                    108,
+                    116
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          },
+          {
+            "name": "token_program"
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "initialize_domain_registry",
+        "discriminator": [
+          117,
+          160,
+          95,
+          91,
+          252,
+          34,
+          75,
+          131
+        ],
+        "accounts": [
+          {
+            "name": "authority",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "program_state",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    112,
+                    114,
+                    111,
+                    103,
+                    114,
+                    97,
+                    109,
+                    95,
+                    115,
+                    116,
+                    97,
+                    116,
+                    101
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "domain_registry",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    100,
+                    111,
+                    109,
+                    97,
+                    105,
+                    110,
+                    95,
+                    114,
+                    101,
+                    103,
+                    105,
+                    115,
+                    116,
+                    114,
+                    121
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "remove_custom_domain",
+        "discriminator": [
+          123,
+          218,
+          7,
+          181,
+          63,
+          66,
+          188,
+          165
+        ],
+        "accounts": [
+          {
+            "name": "domain_registry",
+            "writable": true
+          },
+          {
+            "name": "authority",
+            "signer": true,
+            "relations": [
+              "domain_registry"
+            ]
+          }
+        ],
+        "args": [
+          {
+            "name": "domain_type",
+            "type": "u8"
+          }
+        ]
+      },
+      {
+        "name": "set_can_stake",
+        "discriminator": [
+          98,
+          164,
+          229,
+          15,
+          18,
+          50,
+          139,
+          125
+        ],
+        "accounts": [
+          {
+            "name": "program_state",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    112,
+                    114,
+                    111,
+                    103,
+                    114,
+                    97,
+                    109,
+                    95,
+                    115,
+                    116,
+                    97,
+                    116,
+                    101
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "admin",
+            "writable": true,
+            "signer": true
+          }
+        ],
+        "args": [
+          {
+            "name": "can_stake",
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "name": "set_paused",
+        "discriminator": [
+          91,
+          60,
+          125,
+          192,
+          176,
+          225,
+          166,
+          218
+        ],
+        "accounts": [
+          {
+            "name": "program_state",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    112,
+                    114,
+                    111,
+                    103,
+                    114,
+                    97,
+                    109,
+                    95,
+                    115,
+                    116,
+                    97,
+                    116,
+                    101
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "admin",
+            "writable": true,
+            "signer": true
+          }
+        ],
+        "args": [
+          {
+            "name": "paused",
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "name": "set_user_rewards",
+        "discriminator": [
+          150,
+          244,
+          216,
+          70,
+          236,
+          29,
+          172,
+          157
+        ],
+        "accounts": [
+          {
+            "name": "program_state",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    112,
+                    114,
+                    111,
+                    103,
+                    114,
+                    97,
+                    109,
+                    95,
+                    115,
+                    116,
+                    97,
+                    116,
+                    101
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "user_reward",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    117,
+                    115,
+                    101,
+                    114,
+                    95,
+                    114,
+                    101,
+                    119,
+                    97,
+                    114,
+                    100
+                  ]
+                },
+                {
+                  "kind": "arg",
+                  "path": "user_address"
+                },
+                {
+                  "kind": "arg",
+                  "path": "batch_id"
+                }
+              ]
+            }
+          },
+          {
+            "name": "market_maker",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          }
+        ],
+        "args": [
+          {
+            "name": "batch_id",
+            "type": "u64"
+          },
+          {
+            "name": "user_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      },
+      {
+        "name": "stake",
+        "discriminator": [
+          206,
+          176,
+          202,
+          18,
+          200,
+          209,
+          179,
+          108
+        ],
+        "accounts": [
+          {
+            "name": "program_state",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    112,
+                    114,
+                    111,
+                    103,
+                    114,
+                    97,
+                    109,
+                    95,
+                    115,
+                    116,
+                    97,
+                    116,
+                    101
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "user_stake",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    117,
+                    115,
+                    101,
+                    114,
+                    95,
+                    115,
+                    116,
+                    97,
+                    107,
+                    101
+                  ]
+                },
+                {
+                  "kind": "account",
+                  "path": "user"
+                }
+              ]
+            }
+          },
+          {
+            "name": "user_token_account",
+            "writable": true
+          },
+          {
+            "name": "vault",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    118,
+                    97,
+                    117,
+                    108,
+                    116
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "user",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "token_program",
+            "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          }
+        ],
+        "args": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "timelock_boost",
+            "type": {
+              "defined": {
+                "name": "TimelockBoost"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "start_preparing_batch",
+        "discriminator": [
+          166,
+          58,
+          229,
+          62,
+          125,
+          29,
+          26,
+          4
+        ],
+        "accounts": [
+          {
+            "name": "program_state",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    112,
+                    114,
+                    111,
+                    103,
+                    114,
+                    97,
+                    109,
+                    95,
+                    115,
+                    116,
+                    97,
+                    116,
+                    101
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "batch",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    98,
+                    97,
+                    116,
+                    99,
+                    104
+                  ]
+                },
+                {
+                  "kind": "account",
+                  "path": "program_state.next_batch_id",
+                  "account": "ProgramState"
+                }
+              ]
+            }
+          },
+          {
+            "name": "market_maker_token_account",
+            "writable": true
+          },
+          {
+            "name": "market_maker",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "vault",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    118,
+                    97,
+                    117,
+                    108,
+                    116
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "domain_registry"
+          },
+          {
+            "name": "token_program",
+            "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          }
+        ],
+        "args": [
+          {
+            "name": "domains",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "DomainReward"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "unstake",
+        "discriminator": [
+          90,
+          95,
+          107,
+          42,
+          205,
+          124,
+          50,
+          225
+        ],
+        "accounts": [
+          {
+            "name": "program_state",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    112,
+                    114,
+                    111,
+                    103,
+                    114,
+                    97,
+                    109,
+                    95,
+                    115,
+                    116,
+                    97,
+                    116,
+                    101
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "user_stake",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    117,
+                    115,
+                    101,
+                    114,
+                    95,
+                    115,
+                    116,
+                    97,
+                    107,
+                    101
+                  ]
+                },
+                {
+                  "kind": "account",
+                  "path": "user"
+                }
+              ]
+            }
+          },
+          {
+            "name": "user_token_account",
+            "writable": true
+          },
+          {
+            "name": "vault",
+            "writable": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    118,
+                    97,
+                    117,
+                    108,
+                    116
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "user_reward",
+            "optional": true,
+            "pda": {
+              "seeds": [
+                {
+                  "kind": "const",
+                  "value": [
+                    117,
+                    115,
+                    101,
+                    114,
+                    95,
+                    114,
+                    101,
+                    119,
+                    97,
+                    114,
+                    100
+                  ]
+                },
+                {
+                  "kind": "account",
+                  "path": "user"
+                }
+              ]
+            }
+          },
+          {
+            "name": "user",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "token_program",
+            "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "update_custom_domain",
+        "discriminator": [
+          138,
+          94,
+          16,
+          146,
+          20,
+          238,
+          11,
+          32
+        ],
+        "accounts": [
+          {
+            "name": "domain_registry",
+            "writable": true
+          },
+          {
+            "name": "authority",
+            "signer": true,
+            "relations": [
+              "domain_registry"
+            ]
+          }
+        ],
+        "args": [
+          {
+            "name": "domain_type",
+            "type": "u8"
+          },
+          {
+            "name": "is_active",
+            "type": "bool"
+          }
+        ]
+      }
+    ],
+    "accounts": [
+      {
+        "name": "Batch",
+        "discriminator": [
+          156,
+          194,
+          70,
+          44,
+          22,
+          88,
+          137,
+          44
+        ]
+      },
+      {
+        "name": "DomainRegistry",
+        "discriminator": [
+          226,
+          107,
+          164,
+          187,
+          87,
+          63,
+          140,
+          57
+        ]
+      },
+      {
+        "name": "ProgramState",
+        "discriminator": [
+          77,
+          209,
+          137,
+          229,
+          149,
+          67,
+          167,
+          230
+        ]
+      },
+      {
+        "name": "UserReward",
+        "discriminator": [
+          174,
+          124,
+          198,
+          235,
+          242,
+          192,
+          95,
+          93
+        ]
+      },
+      {
+        "name": "UserStake",
+        "discriminator": [
+          102,
+          53,
+          163,
+          107,
+          9,
+          138,
+          87,
+          153
+        ]
+      }
+    ],
+    "events": [
+      {
+        "name": "BatchStarted",
+        "discriminator": [
+          171,
+          56,
+          230,
+          2,
+          106,
+          231,
+          14,
+          186
+        ]
+      },
+      {
+        "name": "CanStakeSet",
+        "discriminator": [
+          7,
+          161,
+          30,
+          176,
+          17,
+          53,
+          44,
+          109
+        ]
+      },
+      {
+        "name": "CustomDomainAdded",
+        "discriminator": [
+          84,
+          8,
+          165,
+          254,
+          74,
+          151,
+          28,
+          252
+        ]
+      },
+      {
+        "name": "CustomDomainRemoved",
+        "discriminator": [
+          154,
+          231,
+          232,
+          31,
+          181,
+          219,
+          147,
+          253
+        ]
+      },
+      {
+        "name": "CustomDomainUpdated",
+        "discriminator": [
+          197,
+          78,
+          77,
+          119,
+          19,
+          115,
+          189,
+          238
+        ]
+      },
+      {
+        "name": "DomainRegistryInitialized",
+        "discriminator": [
+          75,
+          33,
+          16,
+          92,
+          36,
+          1,
+          237,
+          222
+        ]
+      },
+      {
+        "name": "PausedSet",
+        "discriminator": [
+          171,
+          125,
+          127,
+          156,
+          233,
+          81,
+          68,
+          66
+        ]
+      },
+      {
+        "name": "ProgramStateInitialized",
+        "discriminator": [
+          52,
+          235,
+          156,
+          191,
+          223,
+          43,
+          109,
+          144
+        ]
+      },
+      {
+        "name": "StakeEvent",
+        "discriminator": [
+          226,
+          134,
+          188,
+          173,
+          19,
+          33,
+          75,
+          175
+        ]
+      },
+      {
+        "name": "UnstakeEvent",
+        "discriminator": [
+          162,
+          104,
+          137,
+          228,
+          81,
+          3,
+          79,
+          197
+        ]
+      }
+    ],
+    "errors": [
+      {
+        "code": 6000,
+        "name": "UnauthorizedCanStakeModification",
+        "msg": "Only admin can modify can_stake flag"
+      },
+      {
+        "code": 6001,
+        "name": "UnauthorizedPauseModification",
+        "msg": "Only admin can pause/unpause the program"
+      },
+      {
+        "code": 6002,
+        "name": "DomainNameTooLong",
+        "msg": "Domain name is too long (max 32 characters)"
+      },
+      {
+        "code": 6003,
+        "name": "InactiveDomain",
+        "msg": "Domain is not active"
+      },
+      {
+        "code": 6004,
+        "name": "DomainAlreadyExists",
+        "msg": "Domain already exists"
+      },
+      {
+        "code": 6005,
+        "name": "UnauthorizedDomainModification",
+        "msg": "Only authority can modify domains"
+      },
+      {
+        "code": 6006,
+        "name": "DomainNotFound",
+        "msg": "Domain not found"
+      },
+      {
+        "code": 6007,
+        "name": "InvalidDomainType",
+        "msg": "Invalid domain type"
+      },
+      {
+        "code": 6008,
+        "name": "InvalidMintDecimals",
+        "msg": "The provided mint account must have 9 decimals"
+      },
+      {
+        "code": 6009,
+        "name": "InvalidMintAuthority",
+        "msg": "The mint authority must be the admin"
+      },
+      {
+        "code": 6010,
+        "name": "BatchNotFound",
+        "msg": "Batch not found"
+      },
+      {
+        "code": 6011,
+        "name": "InvalidBatchAmount",
+        "msg": "Invalid batch amount"
+      },
+      {
+        "code": 6012,
+        "name": "RewardsAlreadySet",
+        "msg": "Rewards already set for this batch"
+      },
+      {
+        "code": 6013,
+        "name": "UnauthorizedBatchCreation",
+        "msg": "Only market maker can create batches"
+      },
+      {
+        "code": 6014,
+        "name": "DuplicateDomainInBatch",
+        "msg": "Duplicate domain in batch"
+      },
+      {
+        "code": 6015,
+        "name": "InvalidTokenAccount",
+        "msg": "Token account must be owned by market maker"
+      },
+      {
+        "code": 6016,
+        "name": "InvalidMint",
+        "msg": "Token account must be of the correct mint"
+      },
+      {
+        "code": 6017,
+        "name": "InsufficientAmount",
+        "msg": "Insufficient token amount for staking"
+      },
+      {
+        "code": 6018,
+        "name": "TimelockNotExpired",
+        "msg": "Cannot unstake before timelock period expires"
+      },
+      {
+        "code": 6019,
+        "name": "StakingDisabled",
+        "msg": "Staking is currently disabled"
+      },
+      {
+        "code": 6020,
+        "name": "ProgramPaused",
+        "msg": "Program is currently paused"
+      },
+      {
+        "code": 6021,
+        "name": "InvalidTimelockPeriod",
+        "msg": "Invalid timelock period. Must be at least the minimum lock period"
+      },
+      {
+        "code": 6022,
+        "name": "WithdrawalsNotEnabled",
+        "msg": "Withdrawals are not enabled for this reward"
+      },
+      {
+        "code": 6023,
+        "name": "InvalidRewardAmount",
+        "msg": "Invalid reward amount"
+      },
+      {
+        "code": 6024,
+        "name": "InvalidOwner",
+        "msg": "Invalid owner for reward account"
+      },
+      {
+        "code": 6025,
+        "name": "ActiveTimelock",
+        "msg": "Cannot modify existing stake while timelock is active"
+      },
+      {
+        "code": 6026,
+        "name": "ExistingStakeActive",
+        "msg": "Must unstake existing position before creating a new one"
+      },
+      {
+        "code": 6027,
+        "name": "InvalidOperation",
+        "msg": "Invalid operation parameters"
+      }
+    ],
+    "types": [
+      {
+        "name": "Batch",
+        "docs": [
+          "Represents a batch of rewards that will be distributed to users"
+        ],
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "batch_id",
+              "docs": [
+                "Unique identifier for this batch"
+              ],
+              "type": "u64"
+            },
+            {
+              "name": "domains",
+              "docs": [
+                "List of domain-specific reward allocations"
+              ],
+              "type": {
+                "vec": {
+                  "defined": {
+                    "name": "DomainReward"
+                  }
+                }
+              }
+            },
+            {
+              "name": "total_amount",
+              "docs": [
+                "Total amount of PGN tokens allocated for this batch"
+              ],
+              "type": "u64"
+            },
+            {
+              "name": "created_at",
+              "docs": [
+                "Timestamp when this batch was created"
+              ],
+              "type": "i64"
+            },
+            {
+              "name": "authority",
+              "docs": [
+                "Authority that can modify this batch (usually the admin)"
+              ],
+              "type": "pubkey"
+            },
+            {
+              "name": "rewards_set",
+              "docs": [
+                "Whether rewards have been set for this batch"
+              ],
+              "type": "bool"
+            },
+            {
+              "name": "bump",
+              "docs": [
+                "Bump seed for PDA derivation"
+              ],
+              "type": "u8"
+            }
+          ]
+        }
+      },
+      {
+        "name": "BatchStarted",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "batch_id",
+              "type": "u64"
+            },
+            {
+              "name": "total_amount",
+              "type": "u64"
+            },
+            {
+              "name": "created_at",
+              "type": "i64"
+            },
+            {
+              "name": "authority",
+              "type": "pubkey"
+            },
+            {
+              "name": "domains",
+              "type": {
+                "vec": {
+                  "defined": {
+                    "name": "DomainReward"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "CanStakeSet",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "can_stake",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      {
+        "name": "CustomDomain",
+        "docs": [
+          "Represents a custom domain configuration"
+        ],
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "name",
+              "docs": [
+                "Domain name"
+              ],
+              "type": "string"
+            },
+            {
+              "name": "domain_type",
+              "docs": [
+                "Unique identifier for the domain"
+              ],
+              "type": "u8"
+            },
+            {
+              "name": "is_active",
+              "docs": [
+                "Whether the domain is currently active"
+              ],
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      {
+        "name": "CustomDomainAdded",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "domain_type",
+              "type": "u8"
+            },
+            {
+              "name": "is_active",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      {
+        "name": "CustomDomainRemoved",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "domain_type",
+              "type": "u8"
+            }
+          ]
+        }
+      },
+      {
+        "name": "CustomDomainUpdated",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "domain_type",
+              "type": "u8"
+            },
+            {
+              "name": "is_active",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      {
+        "name": "DomainRegistry",
+        "docs": [
+          "Registry for managing custom domains"
+        ],
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "authority",
+              "docs": [
+                "Authority that can add/modify domains"
+              ],
+              "type": "pubkey"
+            },
+            {
+              "name": "custom_domains",
+              "docs": [
+                "List of custom domains"
+              ],
+              "type": {
+                "vec": {
+                  "defined": {
+                    "name": "CustomDomain"
+                  }
+                }
+              }
+            },
+            {
+              "name": "next_domain_type",
+              "docs": [
+                "Next available domain type identifier"
+              ],
+              "type": "u8"
+            },
+            {
+              "name": "bump",
+              "docs": [
+                "Account bump"
+              ],
+              "type": "u8"
+            }
+          ]
+        }
+      },
+      {
+        "name": "DomainRegistryInitialized",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "authority",
+              "type": "pubkey"
+            },
+            {
+              "name": "custom_domains",
+              "type": "u32"
+            },
+            {
+              "name": "next_domain_type",
+              "type": "u8"
+            }
+          ]
+        }
+      },
+      {
+        "name": "DomainReward",
+        "docs": [
+          "Represents a reward allocation for a specific domain"
+        ],
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "domain_name",
+              "docs": [
+                "Name of the domain (e.g., \"Paragon\", \"Helios\", etc.)"
+              ],
+              "type": "string"
+            },
+            {
+              "name": "amount",
+              "docs": [
+                "Amount of PGN tokens allocated for rewards in this domain"
+              ],
+              "type": "u64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "PausedSet",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "paused",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      {
+        "name": "ProgramState",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "root_admin",
+              "type": "pubkey"
+            },
+            {
+              "name": "market_maker",
+              "docs": [
+                "Market Maker authority for creating reward batches"
+              ],
+              "type": "pubkey"
+            },
+            {
+              "name": "pgn_mint",
+              "docs": [
+                "Address of the PGN token mint"
+              ],
+              "type": "pubkey"
+            },
+            {
+              "name": "can_stake",
+              "docs": [
+                "Flag to enable/disable staking program-wide"
+              ],
+              "type": "bool"
+            },
+            {
+              "name": "paused",
+              "docs": [
+                "Flag for emergency pause of all operations"
+              ],
+              "type": "bool"
+            },
+            {
+              "name": "minimum_lock_period",
+              "docs": [
+                "Minimum lock period in seconds (1 month)"
+              ],
+              "type": "i64"
+            },
+            {
+              "name": "next_batch_id",
+              "docs": [
+                "Next available batch ID"
+              ],
+              "type": "u64"
+            },
+            {
+              "name": "bump",
+              "docs": [
+                "Bump seed for PDA derivation"
+              ],
+              "type": "u8"
+            }
+          ]
+        }
+      },
+      {
+        "name": "ProgramStateInitialized",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "root_admin",
+              "type": "pubkey"
+            },
+            {
+              "name": "market_maker",
+              "type": "pubkey"
+            },
+            {
+              "name": "pgn_mint",
+              "type": "pubkey"
+            },
+            {
+              "name": "can_stake",
+              "type": "bool"
+            },
+            {
+              "name": "paused",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      {
+        "name": "StakeEvent",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "user",
+              "docs": [
+                "The user who staked"
+              ],
+              "type": "pubkey"
+            },
+            {
+              "name": "amount",
+              "docs": [
+                "Amount of tokens staked"
+              ],
+              "type": "u64"
+            },
+            {
+              "name": "timelock_boost",
+              "docs": [
+                "The timelock boost selected"
+              ],
+              "type": {
+                "defined": {
+                  "name": "TimelockBoost"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "docs": [
+                "Timestamp when the stake was made"
+              ],
+              "type": "i64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "TimelockBoost",
+        "docs": [
+          "Represents the different boost multipliers based on timelock duration"
+        ],
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "NoLock"
+            },
+            {
+              "name": "OneMonth"
+            },
+            {
+              "name": "ThreeMonths"
+            },
+            {
+              "name": "SixMonths"
+            },
+            {
+              "name": "NineMonths"
+            }
+          ]
+        }
+      },
+      {
+        "name": "UnstakeEvent",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "user",
+              "docs": [
+                "The user who unstaked"
+              ],
+              "type": "pubkey"
+            },
+            {
+              "name": "amount",
+              "docs": [
+                "Amount of tokens unstaked"
+              ],
+              "type": "u64"
+            },
+            {
+              "name": "timestamp",
+              "docs": [
+                "Timestamp when the unstake was made"
+              ],
+              "type": "i64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "UserReward",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "owner",
+              "docs": [
+                "The owner of this reward account"
+              ],
+              "type": "pubkey"
+            },
+            {
+              "name": "amount",
+              "docs": [
+                "Amount of PGN tokens to be rewarded"
+              ],
+              "type": "u64"
+            },
+            {
+              "name": "can_withdraw",
+              "docs": [
+                "Whether the user can withdraw the reward"
+              ],
+              "type": "bool"
+            },
+            {
+              "name": "batch_id",
+              "docs": [
+                "The batch ID this reward belongs to"
+              ],
+              "type": "u64"
+            },
+            {
+              "name": "bump",
+              "docs": [
+                "Bump seed for PDA derivation"
+              ],
+              "type": "u8"
+            }
+          ]
+        }
+      },
+      {
+        "name": "UserStake",
+        "docs": [
+          "Represents a user's stake in the program"
+        ],
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "owner",
+              "docs": [
+                "The owner of this stake account"
+              ],
+              "type": "pubkey"
+            },
+            {
+              "name": "amount",
+              "docs": [
+                "Amount of PGN tokens staked"
+              ],
+              "type": "u64"
+            },
+            {
+              "name": "timelock_end",
+              "docs": [
+                "Unix timestamp when the timelock expires"
+              ],
+              "type": "i64"
+            },
+            {
+              "name": "timelock_boost",
+              "docs": [
+                "Current timelock boost multiplier"
+              ],
+              "type": {
+                "defined": {
+                  "name": "TimelockBoost"
+                }
+              }
+            },
+            {
+              "name": "bump",
+              "docs": [
+                "Bump seed for PDA derivation"
+              ],
+              "type": "u8"
+            }
+          ]
+        }
+      }
+    ]
+  }
