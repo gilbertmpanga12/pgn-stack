@@ -1,26 +1,26 @@
 'use client'
-import React, { useState, useEffect } from 'react'
-import {
-  Wallet,
-  Clock,
-  Lock,
-  TrendingUp,
-  AlertCircle,
-  CheckCircle2,
-} from 'lucide-react'
-import WalletConnector from './components/WalletConnector'
-import WalletHeader from './components/WalletHeader'
-import AccountOverview from './components/AccountOverview'
-import { useWallet } from '@/hooks/useWallet'
-import { accountInfo } from '@/lib/solana/connection'
+
+import React, { useState, useEffect, useCallback } from 'react'
+import { Clock, Lock, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { Program, AnchorProvider, setProvider, BN } from '@coral-xyz/anchor'
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
-import type { PgnStaking } from '@/idl/staking_devnet'
-import idl from '@/idl/staking_devnet.json'
 import { PublicKey, SystemProgram } from '@solana/web3.js'
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
-const PROGRAM_ID = new PublicKey("8icXpLgEgEVVbvhTAgL7W7AUMZbaUh1UJ1czMiQXCuVE");
+// Components
+import WalletConnector from './components/WalletConnector'
+import WalletHeader from './components/WalletHeader'
+import AccountOverview from './components/AccountOverview'
+
+// Hooks & Utils
+import { useWallet } from '@/hooks/useWallet'
+import { accountInfo } from '@/lib/solana/connection'
+import type { PgnStaking } from '@/idl/staking_devnet'
+import idl from '@/idl/staking_devnet.json'
+
+// Constants
+const PROGRAM_ID = new PublicKey("8icXpLgEgEVVbvhTAgL7W7AUMZbaUh1UJ1czMiQXCuVE")
+const LAMPORTS_PER_SOL = 1_000_000_000
 
 // Timelock options with boost multipliers
 const TIMELOCK_OPTIONS = [
@@ -61,70 +61,117 @@ const TIMELOCK_OPTIONS = [
   },
 ]
 
-const StakingInterface = () => {
+// Types
+interface TxStatus {
+  type: 'success' | 'error' | 'pending'
+  message: string
+  txHash?: string
+}
+
+const StakingInterface: React.FC = () => {
+  // Wallet & Connection
   const { connection } = useConnection()
-  const wallet = useAnchorWallet();
-  
-  const provider = wallet ? new AnchorProvider(
-    connection, 
-    wallet, 
-    AnchorProvider.defaultOptions()
-  ) : null
-  
-  // Set the provider globally for Anchor
-  if (provider) {
-    setProvider(provider)
-  }
-  
-const program = provider ? new Program(idl as PgnStaking, provider) : null
-  
+  const wallet = useAnchorWallet()
   const { connected, connect, disconnect, publicKey } = useWallet()
+
+  // State
   const [pgnBalance, setPgnBalance] = useState('0.00')
   const [stakedAmount, setStakedAmount] = useState('0.00')
   const [myBalance, setMyBalance] = useState('0.00')
   const [stakeAmount, setStakeAmount] = useState('')
   const [selectedTimelock, setSelectedTimelock] = useState('oneMonth')
   const [isStaking, setIsStaking] = useState(false)
-  const [txStatus, setTxStatus] = useState<any>(null)
+  const [txStatus, setTxStatus] = useState<TxStatus | null>(null)
 
-  useEffect(() => {
+  // Anchor setup
+  const provider = wallet ? new AnchorProvider(
+    connection,
+    wallet,
+    AnchorProvider.defaultOptions()
+  ) : null
 
-    async function fetchWalletInfo() {
-      const info = await accountInfo(publicKey);
-      setPgnBalance(
-        `${(info?.accountInfo?.lamports as number) / 1_000_000_000}`,
-      )
-      setMyBalance(`${(info?.myBalance as number) / 1_000_000_000}`)
-    }
-     if (publicKey) fetchWalletInfo();
-  }, [publicKey])
+  const program = provider ? new Program(idl as PgnStaking, provider) : null
 
 
-  const getProgramStatePDA = () => {
+  if (provider) {
+    setProvider(provider)
+  }
+
+
+  const formatBalance = (balance: number): string => {
+    return `${(balance / LAMPORTS_PER_SOL)}`
+  }
+
+  const getProgramStatePDA = useCallback((): PublicKey => {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("program_state")],
       PROGRAM_ID
     )[0]
-  }
+  }, [])
 
-  const getUserStakePDA = (userPublicKey: PublicKey) => {
+  const getUserStakePDA = useCallback((userPublicKey: PublicKey): PublicKey => {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("user_stake"), userPublicKey.toBuffer()],
       PROGRAM_ID
     )[0]
-  }
+  }, [])
 
-  const getVaultPDA = () => {
+  const getVaultPDA = useCallback((): PublicKey => {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("vault")],
       PROGRAM_ID
     )[0]
+  }, [])
+
+  // Fetch wallet information
+  const fetchWalletInfo = useCallback(async () => {
+    if (!publicKey) return
+
+    try {
+      const info = await accountInfo(publicKey)
+      
+      if (info?.accountInfo?.lamports) {
+        setPgnBalance(formatBalance(info.accountInfo.lamports))
+      }
+      
+      if (info?.myBalance) {
+        setMyBalance(formatBalance(info.myBalance))
+      }
+    } catch (error) {
+      console.error('Error fetching wallet info:', error)
+      setTxStatus({
+        type: 'error',
+        message: 'Failed to fetch wallet information'
+      })
+    }
+  }, [publicKey])
+
+  // Effects
+  useEffect(() => {
+    if (publicKey) {
+      fetchWalletInfo()
+    }
+  }, [publicKey, fetchWalletInfo])
+
+  // Clear status after delay
+  useEffect(() => {
+    if (txStatus) {
+      const timer = setTimeout(() => setTxStatus(null), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [txStatus])
+
+  // Handlers
+  const handleMaxClick = () => {
+    setStakeAmount(pgnBalance.replace(',', ''))
   }
 
-  
-
-  // Mock function to handle staking (you'll replace with actual Anchor call)
   const handleStake = async () => {
+    if (!program || !publicKey) {
+      setTxStatus({ type: 'error', message: 'Wallet not connected properly' })
+      return
+    }
+
     if (!stakeAmount || parseFloat(stakeAmount) <= 0) {
       setTxStatus({ type: 'error', message: 'Please enter a valid amount' })
       return
@@ -132,16 +179,18 @@ const program = provider ? new Program(idl as PgnStaking, provider) : null
 
     setIsStaking(true)
     setTxStatus({ type: 'pending', message: 'Preparing transaction...' })
-    const userPublicKey = typeof publicKey === 'string' 
+
+    try {
+      const userPublicKey = typeof publicKey === 'string' 
         ? new PublicKey(publicKey) 
         : publicKey
 
-    const programStatePDA = getProgramStatePDA()
-  const userStakePDA = getUserStakePDA(userPublicKey)
-  const vaultPDA = getVaultPDA()
+      const programStatePDA = getProgramStatePDA()
+      const userStakePDA = getUserStakePDA(userPublicKey)
+      const vaultPDA = getVaultPDA()
 
-
-  const programStateAccount = await program.account.programState.fetch(programStatePDA)
+      // Fetch program state to get PGN mint
+      const programStateAccount = await program.account.programState.fetch(programStatePDA)
       const pgnMint = programStateAccount.pgnMint
 
       // Get user's token account
@@ -150,17 +199,19 @@ const program = provider ? new Program(idl as PgnStaking, provider) : null
         userPublicKey
       )
 
-    try {
-      const tx = await program.methods
-        .stake(new BN(parseFloat(stakeAmount) * 1e9), {
-          [selectedTimelock]: {},
-        })
+      const stakeAmountBN = new BN(parseFloat(stakeAmount) * LAMPORTS_PER_SOL)
+      const timelockOption = { [selectedTimelock]: {} }
+
+      setTxStatus({ type: 'pending', message: 'Sending transaction...' })
+
+      const txHash = await program.methods
+        .stake(stakeAmountBN, timelockOption)
         .accounts({
           programState: programStatePDA,
           userStake: userStakePDA,
           userTokenAccount: userTokenAccount,
           vault: vaultPDA,
-          user: userPublicKey, // Use the properly typed userPublicKey
+          user: userPublicKey,
           tokenProgram: TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
         })
@@ -169,40 +220,40 @@ const program = provider ? new Program(idl as PgnStaking, provider) : null
       setTxStatus({
         type: 'success',
         message: `Successfully staked ${stakeAmount} PGN tokens!`,
-        txHash: 'demo_tx_hash_123...',
+        txHash: txHash,
       })
 
       // Update balances
       const stakedValue = parseFloat(stakeAmount)
       const currentBalance = parseFloat(pgnBalance.replace(',', ''))
-      setPgnBalance((currentBalance - stakedValue).toLocaleString())
+      setPgnBalance((currentBalance - stakedValue).toFixed(2))
       setStakedAmount(
-        (
-          parseFloat(stakedAmount.replace(',', '')) + stakedValue
-        ).toLocaleString(),
+        (parseFloat(stakedAmount.replace(',', '')) + stakedValue).toFixed(2)
       )
       setStakeAmount('')
+
     } catch (error) {
-      console.log(error)
+      console.error('Staking error:', error)
       setTxStatus({
         type: 'error',
-        message: 'Transaction failed. Please try again.',
+        message: error instanceof Error ? error.message : 'Transaction failed. Please try again.',
       })
     } finally {
       setIsStaking(false)
-      setTimeout(() => setTxStatus(null), 5000)
     }
   }
 
+  // Computed values
   const selectedTimelockData = TIMELOCK_OPTIONS.find(
-    (option) => option.id === selectedTimelock,
+    (option) => option.id === selectedTimelock
   )
 
+  const isValidAmount = stakeAmount && parseFloat(stakeAmount) > 0
+
+  // Render wallet connector if not connected
   if (!connected) {
     return <WalletConnector connect={connect} />
   }
-
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
@@ -239,14 +290,16 @@ const program = provider ? new Program(idl as PgnStaking, provider) : null
                     onChange={(e) => setStakeAmount(e.target.value)}
                     placeholder="0.00"
                     className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20"
+                    disabled={isStaking}
                   />
                   <span className="absolute right-3 top-3 text-gray-400">
                     PGN
                   </span>
                 </div>
                 <button
-                  onClick={() => setStakeAmount(pgnBalance.replace(',', ''))}
-                  className="mt-2 text-purple-400 hover:text-purple-300 text-sm transition-colors"
+                  onClick={handleMaxClick}
+                  disabled={isStaking}
+                  className="mt-2 text-purple-400 hover:text-purple-300 text-sm transition-colors disabled:opacity-50"
                 >
                   Max: {pgnBalance} PGN
                 </button>
@@ -266,6 +319,7 @@ const program = provider ? new Program(idl as PgnStaking, provider) : null
                         value={option.id}
                         checked={selectedTimelock === option.id}
                         onChange={(e) => setSelectedTimelock(e.target.value)}
+                        disabled={isStaking}
                         className="sr-only"
                       />
                       <div
@@ -273,7 +327,7 @@ const program = provider ? new Program(idl as PgnStaking, provider) : null
                           selectedTimelock === option.id
                             ? 'border-purple-400 bg-purple-400/10'
                             : 'border-white/20 bg-white/5 hover:border-white/30'
-                        }`}
+                        } ${isStaking ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <div className="flex justify-between items-center">
                           <div>
@@ -298,7 +352,7 @@ const program = provider ? new Program(idl as PgnStaking, provider) : null
               </div>
 
               {/* Staking Summary */}
-              {stakeAmount && (
+              {isValidAmount && (
                 <div className="bg-purple-500/10 border border-purple-400/30 rounded-xl p-4">
                   <h3 className="text-purple-200 font-medium mb-2">
                     Staking Summary
@@ -344,7 +398,7 @@ const program = provider ? new Program(idl as PgnStaking, provider) : null
                   {txStatus.type === 'pending' && (
                     <Clock className="w-5 h-5 text-blue-400 animate-spin" />
                   )}
-                  <div>
+                  <div className="flex-1">
                     <p
                       className={`text-sm font-medium ${
                         txStatus.type === 'success'
@@ -357,7 +411,7 @@ const program = provider ? new Program(idl as PgnStaking, provider) : null
                       {txStatus.message}
                     </p>
                     {txStatus.txHash && (
-                      <p className="text-gray-400 text-xs mt-1 font-mono">
+                      <p className="text-gray-400 text-xs mt-1 font-mono break-all">
                         Tx: {txStatus.txHash}
                       </p>
                     )}
@@ -365,12 +419,10 @@ const program = provider ? new Program(idl as PgnStaking, provider) : null
                 </div>
               )}
 
-              {/* Stake Button handleStake*/}
+              {/* Stake Button */}
               <button
                 onClick={handleStake}
-                disabled={
-                  isStaking || !stakeAmount || parseFloat(stakeAmount) <= 0
-                }
+                disabled={isStaking || !isValidAmount}
                 className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 disabled:from-gray-500 disabled:to-gray-600 disabled:opacity-50 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100 disabled:cursor-not-allowed"
               >
                 {isStaking ? (
