@@ -20,6 +20,8 @@ import idl from '@/idl/staking_devnet.json'
 import { PublicKey, SystemProgram } from '@solana/web3.js'
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
+const PROGRAM_ID = new PublicKey("8icXpLgEgEVVbvhTAgL7W7AUMZbaUh1UJ1czMiQXCuVE");
+
 // Timelock options with boost multipliers
 const TIMELOCK_OPTIONS = [
   {
@@ -60,59 +62,66 @@ const TIMELOCK_OPTIONS = [
 ]
 
 const StakingInterface = () => {
-  const { publicKey } = useWallet()
   const { connection } = useConnection()
-  const wallet = useAnchorWallet()
-  const provider = new AnchorProvider(connection, wallet as any, {})
-  setProvider(provider)
-  const program = new Program(idl as PgnStaking, {
-    connection,
-  })
-  const { connected, connect, disconnect } = useWallet()
+  const wallet = useAnchorWallet();
+  
+  const provider = wallet ? new AnchorProvider(
+    connection, 
+    wallet, 
+    AnchorProvider.defaultOptions()
+  ) : null
+  
+  // Set the provider globally for Anchor
+  if (provider) {
+    setProvider(provider)
+  }
+  
+const program = provider ? new Program(idl as PgnStaking, provider) : null
+  
+  const { connected, connect, disconnect, publicKey } = useWallet()
   const [pgnBalance, setPgnBalance] = useState('0.00')
   const [stakedAmount, setStakedAmount] = useState('0.00')
+  const [myBalance, setMyBalance] = useState('0.00')
   const [stakeAmount, setStakeAmount] = useState('')
   const [selectedTimelock, setSelectedTimelock] = useState('oneMonth')
   const [isStaking, setIsStaking] = useState(false)
   const [txStatus, setTxStatus] = useState<any>(null)
 
   useEffect(() => {
+
     async function fetchWalletInfo() {
-      const info = await accountInfo()
-      console.log(info)
+      const info = await accountInfo(publicKey);
       setPgnBalance(
         `${(info?.accountInfo?.lamports as number) / 1_000_000_000}`,
       )
+      setMyBalance(`${(info?.myBalance as number) / 1_000_000_000}`)
     }
-    fetchWalletInfo()
-  }, [])
-
-  const [programStatePDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('program_state')],
-    program.programId,
-  )
-
-  if (publicKey) {
-    var [userStakePDA] = PublicKey.findProgramAddressSync(
-      [Buffer.from('user_stake'), new PublicKey(publicKey).toBuffer()],
-      program.programId,
-    )
-
-    console.log('userStakePDA:', userStakePDA.toBase58())
-  }
-
-  const [vaultPDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('vault')],
-    program.programId,
-  )
-
-  useEffect(() => {
-    (async() => {
-      const x: any = program?.account;
-      console.log('check state', x);
-    })()
+     if (publicKey) fetchWalletInfo();
   }, [publicKey])
 
+
+  const getProgramStatePDA = () => {
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("program_state")],
+      PROGRAM_ID
+    )[0]
+  }
+
+  const getUserStakePDA = (userPublicKey: PublicKey) => {
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("user_stake"), userPublicKey.toBuffer()],
+      PROGRAM_ID
+    )[0]
+  }
+
+  const getVaultPDA = () => {
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("vault")],
+      PROGRAM_ID
+    )[0]
+  }
+
+  
 
   // Mock function to handle staking (you'll replace with actual Anchor call)
   const handleStake = async () => {
@@ -123,32 +132,40 @@ const StakingInterface = () => {
 
     setIsStaking(true)
     setTxStatus({ type: 'pending', message: 'Preparing transaction...' })
+    const userPublicKey = typeof publicKey === 'string' 
+        ? new PublicKey(publicKey) 
+        : publicKey
 
-    try {
-      await program.account
-      const programState = program?.account
-      const pgnMint: any = null//programState.pgnMint
+    const programStatePDA = getProgramStatePDA()
+  const userStakePDA = getUserStakePDA(userPublicKey)
+  const vaultPDA = getVaultPDA()
 
+
+  const programStateAccount = await program.account.programState.fetch(programStatePDA)
+      const pgnMint = programStateAccount.pgnMint
+
+      // Get user's token account
       const userTokenAccount = await getAssociatedTokenAddress(
         pgnMint,
-        publicKey,
+        userPublicKey
       )
 
+    try {
       const tx = await program.methods
         .stake(new BN(parseFloat(stakeAmount) * 1e9), {
           [selectedTimelock]: {},
         })
         .accounts({
-          user: publicKey,
-          userTokenAccount,
-          vault: vaultPDA,
-          userStake: userStakePDA,
           programState: programStatePDA,
-          systemProgram: SystemProgram.programId,
+          userStake: userStakePDA,
+          userTokenAccount: userTokenAccount,
+          vault: vaultPDA,
+          user: userPublicKey, // Use the properly typed userPublicKey
           tokenProgram: TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
         })
         .rpc()
-      console.log('---->', tx)
+
       setTxStatus({
         type: 'success',
         message: `Successfully staked ${stakeAmount} PGN tokens!`,
@@ -199,6 +216,7 @@ const StakingInterface = () => {
             pgnBalance={pgnBalance}
             stakedAmount={stakedAmount}
             selectedTimelockData={selectedTimelockData}
+            myBalance={myBalance}
           />
 
           {/* Staking Form */}

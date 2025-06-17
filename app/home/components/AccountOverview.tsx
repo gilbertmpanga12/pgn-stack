@@ -4,13 +4,15 @@ import { useEffect } from 'react';
 type Props = {
   pgnBalance: string,
   stakedAmount: string,
-  selectedTimelockData: any
+  selectedTimelockData: any,
+  myBalance: string,
 };
 
 export default function AccountOverview({
   pgnBalance,
   stakedAmount,
   selectedTimelockData,
+ myBalance = '0.00'
 }: Props) {
   
   return (
@@ -24,6 +26,11 @@ export default function AccountOverview({
         <div className="bg-white/5 rounded-xl p-4">
           <p className="text-gray-300 text-sm mb-1">Available PGN Balance</p>
           <p className="text-2xl font-bold text-green-400">{pgnBalance} PGN</p>
+        </div>
+
+        <div className="bg-white/5 rounded-xl p-4">
+          <p className="text-gray-300 text-sm mb-1">My PGN Balance</p>
+          <p className="text-2xl font-bold text-blue-400">{myBalance} PGN</p>
         </div>
 
         <div className="bg-white/5 rounded-xl p-4">

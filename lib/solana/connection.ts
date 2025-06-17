@@ -1,7 +1,6 @@
 import { Connection, PublicKey } from "@solana/web3.js";
 import { Buffer } from 'buffer';
 
-
 const connection = new Connection(
   "https://api.devnet.solana.com",
   "confirmed"
@@ -9,8 +8,11 @@ const connection = new Connection(
 
 const address = new PublicKey("8icXpLgEgEVVbvhTAgL7W7AUMZbaUh1UJ1czMiQXCuVE");
 
-export const accountInfo = async () => {
-    const info = await connection.getAccountInfo(address);
+export const accountInfo = async (userAddress: string = '') => {
+   try{
+ const info = await connection.getAccountInfo(address);
+ const lamports = await connection.getBalance(new PublicKey(userAddress));
+ 
     if (!info || !info.data) {
         return null;
     }
@@ -28,6 +30,15 @@ export const accountInfo = async () => {
     return {
         accountInfo: info,
         deserializedData,
-        rawBuffer: buffer
+        rawBuffer: buffer,
+        myBalance: lamports
     }
+   }catch(e){
+    console.log('failed to get user info',e )
+   }
 };
+
+
+export const anchorWallet = async () => {
+
+}
