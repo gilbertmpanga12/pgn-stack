@@ -108,7 +108,7 @@ const StakingInterface = () => {
 
   useEffect(() => {
     (async() => {
-      const x = program?.account?.programState
+      const x: any = program?.account;
       console.log('check state', x);
     })()
   }, [publicKey])
@@ -126,8 +126,8 @@ const StakingInterface = () => {
 
     try {
       await program.account
-      const programState = program?.account?.programState
-      const pgnMint = programState.pgnMint
+      const programState = program?.account
+      const pgnMint: any = null//programState.pgnMint
 
       const userTokenAccount = await getAssociatedTokenAddress(
         pgnMint,
