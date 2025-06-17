@@ -17,49 +17,12 @@ import { useWallet } from '@/hooks/useWallet'
 import { accountInfo } from '@/lib/solana/connection'
 import type { PgnStaking } from '@/idl/staking_devnet'
 import idl from '@/idl/staking_devnet.json'
+import { formatBalance } from '@/lib/utils'
+import { TIMELOCK_OPTIONS } from './data/TIMELOCK_OPTIONS'
 
 // Constants
 const PROGRAM_ID = new PublicKey("8icXpLgEgEVVbvhTAgL7W7AUMZbaUh1UJ1czMiQXCuVE")
 const LAMPORTS_PER_SOL = 1_000_000_000
-
-// Timelock options with boost multipliers
-const TIMELOCK_OPTIONS = [
-  {
-    id: 'noLock',
-    label: 'No Lock',
-    months: 0,
-    boost: '1x',
-    description: 'Unstake anytime',
-  },
-  {
-    id: 'oneMonth',
-    label: '1 Month',
-    months: 1,
-    boost: '2x',
-    description: '30 days locked',
-  },
-  {
-    id: 'threeMonths',
-    label: '3 Months',
-    months: 3,
-    boost: '3x',
-    description: '90 days locked',
-  },
-  {
-    id: 'sixMonths',
-    label: '6 Months',
-    months: 6,
-    boost: '4x',
-    description: '180 days locked',
-  },
-  {
-    id: 'nineMonths',
-    label: '9 Months',
-    months: 9,
-    boost: '5x',
-    description: '270 days locked',
-  },
-]
 
 // Types
 interface TxStatus {
@@ -98,10 +61,7 @@ const StakingInterface: React.FC = () => {
   }
 
 
-  const formatBalance = (balance: number): string => {
-    return `${(balance / LAMPORTS_PER_SOL)}`
-  }
-
+ 
   const getProgramStatePDA = useCallback((): PublicKey => {
     return PublicKey.findProgramAddressSync(
       [Buffer.from("program_state")],
