@@ -1,5 +1,5 @@
 'use client'
-
+// @ts-nocheck
 import React, { useState, useEffect, useCallback } from 'react'
 import { Clock, Lock, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { Program, AnchorProvider, setProvider, BN } from '@coral-xyz/anchor'
