@@ -1,11 +1,12 @@
 'use client'
-// @ts-nocheck
+
 import React, { useState, useEffect, useCallback } from 'react'
 import { Clock, Lock, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { Program, AnchorProvider, setProvider, BN } from '@coral-xyz/anchor'
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
 import { PublicKey, SystemProgram } from '@solana/web3.js'
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import TransactionStatus from './components/TransactionStatus'
 
 // Components
 import WalletConnector from './components/WalletConnector'
@@ -19,9 +20,10 @@ import type { PgnStaking } from '@/idl/staking_devnet'
 import idl from '@/idl/staking_devnet.json'
 import { formatBalance } from '@/lib/utils'
 import { TIMELOCK_OPTIONS } from './data/TIMELOCK_OPTIONS'
+import StakingSummary from './components/StakingSummary'
 
 // Constants
-const PROGRAM_ID = new PublicKey("8icXpLgEgEVVbvhTAgL7W7AUMZbaUh1UJ1czMiQXCuVE")
+const PROGRAM_ID = new PublicKey('8icXpLgEgEVVbvhTAgL7W7AUMZbaUh1UJ1czMiQXCuVE')
 const LAMPORTS_PER_SOL = 1_000_000_000
 
 // Types
@@ -47,39 +49,36 @@ const StakingInterface: React.FC = () => {
   const [txStatus, setTxStatus] = useState<TxStatus | null>(null)
 
   // Anchor setup
-  const provider = wallet ? new AnchorProvider(
-    connection,
-    wallet,
-    AnchorProvider.defaultOptions()
-  ) : null
+  const provider = wallet
+    ? new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions())
+    : null
 
-  const program = provider ? new Program(idl as PgnStaking, provider) : null
-
+  const program: any = provider
+    ? new Program(idl as PgnStaking, provider)
+    : null
 
   if (provider) {
     setProvider(provider)
   }
 
-
- 
   const getProgramStatePDA = useCallback((): PublicKey => {
     return PublicKey.findProgramAddressSync(
-      [Buffer.from("program_state")],
-      PROGRAM_ID
+      [Buffer.from('program_state')],
+      PROGRAM_ID,
     )[0]
   }, [])
 
   const getUserStakePDA = useCallback((userPublicKey: PublicKey): PublicKey => {
     return PublicKey.findProgramAddressSync(
-      [Buffer.from("user_stake"), userPublicKey.toBuffer()],
-      PROGRAM_ID
+      [Buffer.from('user_stake'), userPublicKey.toBuffer()],
+      PROGRAM_ID,
     )[0]
   }, [])
 
   const getVaultPDA = useCallback((): PublicKey => {
     return PublicKey.findProgramAddressSync(
-      [Buffer.from("vault")],
-      PROGRAM_ID
+      [Buffer.from('vault')],
+      PROGRAM_ID,
     )[0]
   }, [])
 
@@ -89,11 +88,11 @@ const StakingInterface: React.FC = () => {
 
     try {
       const info = await accountInfo(publicKey)
-      
+
       if (info?.accountInfo?.lamports) {
         setPgnBalance(formatBalance(info.accountInfo.lamports))
       }
-      
+
       if (info?.myBalance) {
         setMyBalance(formatBalance(info.myBalance))
       }
@@ -101,7 +100,7 @@ const StakingInterface: React.FC = () => {
       console.error('Error fetching wallet info:', error)
       setTxStatus({
         type: 'error',
-        message: 'Failed to fetch wallet information'
+        message: 'Failed to fetch wallet information',
       })
     }
   }, [publicKey])
@@ -141,22 +140,23 @@ const StakingInterface: React.FC = () => {
     setTxStatus({ type: 'pending', message: 'Preparing transaction...' })
 
     try {
-      const userPublicKey = typeof publicKey === 'string' 
-        ? new PublicKey(publicKey) 
-        : publicKey
+      const userPublicKey =
+        typeof publicKey === 'string' ? new PublicKey(publicKey) : publicKey
 
       const programStatePDA = getProgramStatePDA()
       const userStakePDA = getUserStakePDA(userPublicKey)
       const vaultPDA = getVaultPDA()
 
       // Fetch program state to get PGN mint
-      const programStateAccount = await program.account.programState.fetch(programStatePDA)
+      const programStateAccount = await program.account.programState.fetch(
+        programStatePDA,
+      )
       const pgnMint = programStateAccount.pgnMint
 
       // Get user's token account
       const userTokenAccount = await getAssociatedTokenAddress(
         pgnMint,
-        userPublicKey
+        userPublicKey,
       )
 
       const stakeAmountBN = new BN(parseFloat(stakeAmount) * LAMPORTS_PER_SOL)
@@ -188,15 +188,17 @@ const StakingInterface: React.FC = () => {
       const currentBalance = parseFloat(pgnBalance.replace(',', ''))
       setPgnBalance((currentBalance - stakedValue).toFixed(2))
       setStakedAmount(
-        (parseFloat(stakedAmount.replace(',', '')) + stakedValue).toFixed(2)
+        (parseFloat(stakedAmount.replace(',', '')) + stakedValue).toFixed(2),
       )
       setStakeAmount('')
-
     } catch (error) {
       console.error('Staking error:', error)
       setTxStatus({
         type: 'error',
-        message: error instanceof Error ? error.message : 'Transaction failed. Please try again.',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Transaction failed. Please try again.',
       })
     } finally {
       setIsStaking(false)
@@ -205,7 +207,7 @@ const StakingInterface: React.FC = () => {
 
   // Computed values
   const selectedTimelockData = TIMELOCK_OPTIONS.find(
-    (option) => option.id === selectedTimelock
+    (option) => option.id === selectedTimelock,
   )
 
   const isValidAmount = stakeAmount && parseFloat(stakeAmount) > 0
@@ -313,71 +315,14 @@ const StakingInterface: React.FC = () => {
 
               {/* Staking Summary */}
               {isValidAmount && (
-                <div className="bg-purple-500/10 border border-purple-400/30 rounded-xl p-4">
-                  <h3 className="text-purple-200 font-medium mb-2">
-                    Staking Summary
-                  </h3>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-300">Amount:</span>
-                      <span className="text-white">{stakeAmount} PGN</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-300">Lock Period:</span>
-                      <span className="text-white">
-                        {selectedTimelockData?.label}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-300">Reward Boost:</span>
-                      <span className="text-green-400 font-medium">
-                        {selectedTimelockData?.boost}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                <StakingSummary
+                  stakeAmount={stakeAmount}
+                  selectedTimelockData={selectedTimelockData}
+                />
               )}
 
               {/* Status Messages */}
-              {txStatus && (
-                <div
-                  className={`p-4 rounded-xl flex items-center gap-3 ${
-                    txStatus.type === 'success'
-                      ? 'bg-green-500/10 border border-green-400/30'
-                      : txStatus.type === 'error'
-                      ? 'bg-red-500/10 border border-red-400/30'
-                      : 'bg-blue-500/10 border border-blue-400/30'
-                  }`}
-                >
-                  {txStatus.type === 'success' && (
-                    <CheckCircle2 className="w-5 h-5 text-green-400" />
-                  )}
-                  {txStatus.type === 'error' && (
-                    <AlertCircle className="w-5 h-5 text-red-400" />
-                  )}
-                  {txStatus.type === 'pending' && (
-                    <Clock className="w-5 h-5 text-blue-400 animate-spin" />
-                  )}
-                  <div className="flex-1">
-                    <p
-                      className={`text-sm font-medium ${
-                        txStatus.type === 'success'
-                          ? 'text-green-400'
-                          : txStatus.type === 'error'
-                          ? 'text-red-400'
-                          : 'text-blue-400'
-                      }`}
-                    >
-                      {txStatus.message}
-                    </p>
-                    {txStatus.txHash && (
-                      <p className="text-gray-400 text-xs mt-1 font-mono break-all">
-                        Tx: {txStatus.txHash}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
+              {txStatus && <TransactionStatus status={txStatus} />}
 
               {/* Stake Button */}
               <button
